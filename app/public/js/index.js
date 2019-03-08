@@ -26,7 +26,9 @@ query {
 `;
 
 const body = document.body;
+debugger;
 client.query({query}).then((results) => {
+    debugger;
     results.data.casas.forEach((casa) => renderCasa(body, casa));
 
 });

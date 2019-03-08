@@ -506,6 +506,7 @@ module.exports = (sequelize, DataTypes) => {
     Casa.associate = (models) => {
         Casa.hasMany(models.periodo,{ foreignKey: 'cod_casa' });
         Casa.hasMany(models.feedback,{ foreignKey: 'cod_casa' });
+        Casa.hasMany(models.reserva,{ foreignKey: 'cod_casa' });
     };
 
     return Casa;

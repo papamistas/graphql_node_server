@@ -13,10 +13,10 @@ const server = new ApolloServer({
   context: { db }
 });
 
-const app = express();
+const app = express ();
 server.applyMiddleware({ app });
 
-app.use(express.static('app/public'));
+//app.use(express.static('app/public'));
 
 db.sequelize.sync().then(() => {
   // populate author table with dummy data

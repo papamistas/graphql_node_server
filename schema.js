@@ -18,9 +18,12 @@ export default `
     designacao: String
     pais: String
     tipo: String
+    titulo :String
     periodos: [Periodo!]!
     feedbacks: [Feedback!]!
+    reservas:[Reserva!]
     destino_complex: String
+    seo_title:String
   }
   type Periodo {
     id: ID!
@@ -38,12 +41,20 @@ export default `
     valor_voto: Int
     comment: String
   }
+  type Reserva {
+    id:ID!
+    cod_casa: ID!
+    idclient: Int
+  
+  }
   type Query {
     casas: [Casa!]!
     casa(cod_casa: ID!): Casa
     periodos: [Periodo!]!
     periodo(id: ID!): Periodo
     feedbacks: [Feedback!]!
+    reservas: [Reserva!]!
+    reserva(id: ID!): Reserva
     feedback(id: ID!): Feedback
   }
   type Mutation {
