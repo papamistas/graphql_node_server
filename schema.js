@@ -19,12 +19,14 @@ export default `
     pais: String
     tipo: String
     titulo :String
+    seoTitle:String
+    proprietario:String
     periodos: [Periodo!]!
     feedbacks: [Feedback!]!
     reservas:[Reserva!]
     feedbackcomment : [Feedbackcomment!]
     destino_complex: String
-    seo_title:String
+    
   }
   type Periodo {
     id: ID!
