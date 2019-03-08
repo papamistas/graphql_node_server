@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('feedbackcoment', {
+  const Feedbackcoment =sequelize.define('feedbackcoment', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -35,6 +35,14 @@ module.exports = function(sequelize, DataTypes) {
       field: 'nome'
     }
   }, {
-    tableName: 'feedbackcoment'
-  });
+        freezeTableName: true,
+
+      }
+
+  );
+
+  Feedbackcoment.associate = (models) => {
+    Feedbackcoment.belongsTo(models.casa,{foreignKey: 'cod_casa'});
+  };
+  return Feedbackcoment;
 };

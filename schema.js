@@ -22,6 +22,7 @@ export default `
     periodos: [Periodo!]!
     feedbacks: [Feedback!]!
     reservas:[Reserva!]
+    feedbackcomment : [Feedbackcomment!]
     destino_complex: String
     seo_title:String
   }
@@ -41,9 +42,15 @@ export default `
     valor_voto: Int
     comment: String
   }
+  type Feedbackcomment {
+    id: ID!
+    cod_casa: ID!
+    valor_voto: Int
+    comment: String
+  }
   type Reserva {
     id:ID!
-    cod_casa: ID!
+    codCasa: ID!
     idclient: Int
   
   }
@@ -53,9 +60,11 @@ export default `
     periodos: [Periodo!]!
     periodo(id: ID!): Periodo
     feedbacks: [Feedback!]!
+    feedback(id: ID!): Feedback
     reservas: [Reserva!]!
     reserva(id: ID!): Reserva
-    feedback(id: ID!): Feedback
+    feedbackcomments: [Feedbackcomment!]!
+    feedbackcomment(id: ID!): Feedbackcomment
   }
   type Mutation {
     createPost(title: String, content:String!, authorId: ID!): Post!

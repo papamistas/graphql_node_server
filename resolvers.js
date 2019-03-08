@@ -3,6 +3,7 @@ export default {
         periodos: (parent, args, context, info) => parent.getPeriodos(),
         feedbacks: (parent, args, context, info) => parent.getFeedbacks(),
         reservas: (parent, args, context, info) =>  parent.getReservas(),
+        feedbackcomment: (parent, args, context, info) =>  parent.getFeedbackcomment(),
         destino_complex: (parent, args, context, info) =>   parent.designacao + ' esta casa encontras-se em zona de ' +  parent.destino
 
         /*{
@@ -25,6 +26,8 @@ export default {
         periodos: (parent, args, {db}, info) => db.periodo.findAll(),
         periodo: (parent, {id}, {db}, info) => db.periodo.findById(id),
         feedbacks: (parent, args, {db}, info) => db.feedback.findAll(),
+        feedbackcomment: (parent, {id}, {db}, info) => db.feedbackcomment.findById(id),
+        feedbackcomments: (parent, args, {db}, info) => db.feedbackcomment.findAll(),
         feedback: (parent, {id}, {db}, info) => db.feedback.findById(id),
         reservas: (parent, args, {db}, info) => db.reserva.findAll(),
         reserva: (parent, args, {db}, info) => db.reserva.findById(id),

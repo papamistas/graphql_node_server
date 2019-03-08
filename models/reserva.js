@@ -17,7 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     codCasa: {
       type: DataTypes.STRING(45),
       allowNull: true,
-      field: 'cod_casa'
+      field: 'codCasa'
     },
     reservado: {
       type: DataTypes.BOOLEAN,
@@ -85,7 +85,7 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'reserva'
   });
   Reserva.associate = (models) => {
-    Reserva.belongsTo(models.casa,{foreignKey: 'cod_casa'});
+    Reserva.belongsTo(models.casa,{foreignKey: 'codCasa'});
   };
 
   return Periodo;
