@@ -100,6 +100,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: false,
       field: 'fb_id'
+    },
+    googleId: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      field: 'google_id'
     }
   }, {
     tableName: 'cliente'

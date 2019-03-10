@@ -42,14 +42,34 @@ app.use(express.static('app/public'));
   );
 //});
 var passport = require('passport')
+    , LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy(
+    function(username, password, done) {
+        var User = db.sequelize.import('./models/cliente.js')
+        User.findOne({ username: username }, function(err, user) {
+            if (err) { return done(err); }
+            if (!user) {
+                return done(null, false, { message: 'Incorrect username.' });
+            }
+            if (!user.validPassword(password)) {
+                return done(null, false, { message: 'Incorrect password.' });
+            }
+            return done(null, user);
+        });
+    }
+));
+
+
+var passport = require('passport')
     , FacebookStrategy = require('passport-facebook').Strategy;
 
 passport.use(new FacebookStrategy(config.fb,
-    function(accessToken, refreshToken, profile, done) {
-        var User =db.sequelize.import('./models/cliente.js')
+    function (accessToken, refreshToken, profile, done) {
+        var User = db.sequelize.import('./models/cliente.js')
 
         User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}})
-            .then(function(err, user) {
+            .then(function (err, user) {
                 return done(err, user);
             });
         /*User.findOrCreate({}, function(err, user) {
@@ -58,6 +78,11 @@ passport.use(new FacebookStrategy(config.fb,
         });*/
     }
 ));
+
+app.post('/login',
+    passport.authenticate('local', { successRedirect: '/',
+        failureRedirect: '/login'})
+);
 
 // Redirect the user to Facebook for authentication.  When complete,
 // Facebook will redirect the user back to the application at
