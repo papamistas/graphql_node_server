@@ -20,7 +20,7 @@ server.applyMiddleware({ app });
 
 app.use(express.static('app/public'));
 
-db.sequelize.sync().then(() => {
+//db.sequelize.sync().then(() => {
   // populate author table with dummy data
 /*  db.author.bulkCreate(
     lodash.times(10, () => ({
@@ -40,7 +40,7 @@ db.sequelize.sync().then(() => {
   app.listen({ port: 7000 }, () =>
     console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
   );
-});
+//});
 var passport = require('passport')
     , FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -75,8 +75,13 @@ var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 passport.use(new GoogleStrategy(config["ggl"],
     function(accessToken, refreshToken, profile, cb) {
-        var Users = require('./models/cliente')
-        Users.findOrCreate({ googleId: profile.id }, function (err, user) {
+        /*var User = require('./models/cliente')
+       import User from './models/cliente'
+        User.findOrCreate({ googleId: profile.id }, function (err, user) {
+            return cb(err, user);
+        });*/
+        var User =db.sequelize.import('./models/cliente.js')
+        User.findOrCreate({ googleId: profile.id }, function (err, user) {
             return cb(err, user);
         });
 
