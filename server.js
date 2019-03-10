@@ -5,7 +5,7 @@ import lodash from 'lodash';
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import db from './models';
-const config = './config/configKeys.json';
+import config from './config/configKeys';
 
 
 
