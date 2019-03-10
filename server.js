@@ -46,10 +46,11 @@ var passport = require('passport')
 
 passport.use(new FacebookStrategy(config.fb,
     function(accessToken, refreshToken, profile, done) {
-        /*User.findOrCreate(..., function(err, user) {
+        var User =db.sequelize.import('./models/cliente.js')
+        User.findOrCreate({}, function(err, user) {
             if (err) { return done(err); }
             done(null, user);
-        });*/
+        });
     }
 ));
 
