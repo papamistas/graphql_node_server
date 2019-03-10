@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --entry ./app/public/js/index.js --output-filename bundle.min.js --output-path ./app/public/js ",
-    "start": "ndb ./node_modules/nodemon/bin/nodemon.js   --exec babel-node server.js",
+    "start": "./node_modules/nodemon/bin/nodemon.js   --exec babel-node server.js",
     "sequelize-skeleton": "./node_modules/sequelize-cli/lib/sequelize init:models; ./node_modules/sequelize-cli/lib/sequelize init:config",
     "init-db": "cd /usr/bin && ./mysql -u root && cd - "
   },
@@ -15,6 +15,7 @@
   "dependencies": {
     "apollo-boost": "^0.1.27",
     "apollo-server-express": "^2.4.0",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
     "express": "^4.16.4",

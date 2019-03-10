@@ -79,7 +79,7 @@ passport.use(new FacebookStrategy(config.fb,
     }
 ));
 
-app.post('/login',
+app.get('/login',
     passport.authenticate('local', { successRedirect: '/',
         failureRedirect: '/login'})
 );
