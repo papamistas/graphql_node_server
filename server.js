@@ -5,7 +5,7 @@ import lodash from 'lodash';
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import db from './models';
-
+const config = './config/configKeys.json';
 
 
 
@@ -44,11 +44,7 @@ db.sequelize.sync().then(() => {
 var passport = require('passport')
     , FacebookStrategy = require('passport-facebook').Strategy;
 
-passport.use(new FacebookStrategy({
-        clientID: 405556700218895,
-        clientSecret: 'f5ff7f0d0de47222be4dcdcd82b65e2a',
-        callbackURL: "http://www.example.com/auth/facebook/callback"
-    },
+passport.use(new FacebookStrategy(config.fb,
     function(accessToken, refreshToken, profile, done) {
         /*User.findOrCreate(..., function(err, user) {
             if (err) { return done(err); }
@@ -77,13 +73,10 @@ var passport = require('passport');
 
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-passport.use(new GoogleStrategy({
-        clientID: '150235012843-eibaqvkld98i32jl8heif2l4krervj5d.apps.googleusercontent.com',
-        clientSecret: '_aSDv_nJGwqzH2YFdlmkzFgs',
-        callbackURL: "http://localhost:7000/auth/google/callback"
-    },
+passport.use(new GoogleStrategy(config["ggl"],
     function(accessToken, refreshToken, profile, cb) {
-        User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        var Users = require('./models/cliente')
+        Users.findOrCreate({ googleId: profile.id }, function (err, user) {
             return cb(err, user);
         });
 
