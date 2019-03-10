@@ -47,10 +47,15 @@ var passport = require('passport')
 passport.use(new FacebookStrategy(config.fb,
     function(accessToken, refreshToken, profile, done) {
         var User =db.sequelize.import('./models/cliente.js')
-        User.findOrCreate({}, function(err, user) {
+
+        User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}})
+            .then(function(err, user) {
+                return done(err, user);
+            });
+        /*User.findOrCreate({}, function(err, user) {
             if (err) { return done(err); }
             done(null, user);
-        });
+        });*/
     }
 ));
 
@@ -82,7 +87,7 @@ passport.use(new GoogleStrategy(config["ggl"],
             return cb(err, user);
         });*/
         var User =db.sequelize.import('./models/cliente.js')
-        User.findOrCreate({ googleId: profile.id }, function (err, user) {
+        User.findOrCreate({where: {google_id: profile.id}, defaults: {cliente: profile.displayName}}, function (err, user) {
             return cb(err, user);
         });
 
