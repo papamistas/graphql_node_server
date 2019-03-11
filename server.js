@@ -21,7 +21,9 @@ const app = express();
 server.applyMiddleware({app});
 
 app.use(express.static('app/public'));
+app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
+app.use(passport.initialize());
 
 app.use(cookieSession({
     name: 'mysession',
@@ -39,6 +41,13 @@ app.listen({port: 7000}, () =>
         return next()
     }
 }*/
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
 
 var FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -66,10 +75,7 @@ passport.use(new GoogleStrategy(config["ggl"],
     function (accessToken, refreshToken, profile, cb) {
 
         var User = db.sequelize.import('./models/cliente.js')
-        User.findOrCreate({
-            where: {google_id: profile.id},
-            defaults: {cliente: profile.displayName}
-        }, function (err, user) {
+        User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}}, function (err, user) {
             return cb(err, user);
         });
 
@@ -82,23 +88,28 @@ passport.use(new LocalStrategy(
 
         function(username, password, done) {
             var User = db.sequelize.import('./models/cliente.js')
-            User.findOne({email: username}, function (err, user) {
-                if (err) {
-                    return done(err);
+            User.findOne({where: {"email": username}}).then(function (user, err) {
+                {
+                    if (err) {
+                        return done(err);
+                    }
+                    if (!user) {
+                        return done(null, false, {message: 'Incorrect username.'});
+                    }
+                    /*if (!user.validPassword(password)) {
+                        return done(null, false, {message: 'Incorrect password.'});
+                    }*/
+                    return done(null, user);
                 }
-                if (!user) {
-                    return done(null, false, {message: 'Incorrect username.'});
-                }
-                if (!user.validPassword(password)) {
-                    return done(null, false, {message: 'Incorrect password.'});
-                }
-                return done(null, user);
             });
         }
 
 ));
 
-
+/*app.post('/auth/login', function(req, res){
+    console.log("body parsing", req.body);
+    //should be something like: {username: YOURUSERNAME, password: YOURPASSWORD}
+});*/
 
 
 app.post('/auth/login',
