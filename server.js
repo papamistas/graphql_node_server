@@ -20,7 +20,7 @@ const server = new ApolloServer({
 const app = express();
 server.applyMiddleware({app});
 
-app.use(express.static('app/public'));
+app.use(express.static('app/dist'));
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
 app.use(passport.initialize());
@@ -30,6 +30,13 @@ app.use(cookieSession({
     keys: ['vueauthrandomkey'],
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 
 app.listen({port: 7000}, () =>
     console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
@@ -75,7 +82,7 @@ passport.use(new GoogleStrategy(config["ggl"],
     function (accessToken, refreshToken, profile, cb) {
 
         var User = db.sequelize.import('./models/cliente.js')
-        User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}}, function (err, user) {
+        User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}}).then( function (err, user) {
             return cb(err, user);
         });
 
