@@ -24,7 +24,7 @@ app.use(express.static('app/dist'));
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
 app.use(passport.initialize());
-
+app.use(passport.session());
 app.use(cookieSession({
     name: 'mysession',
     keys: ['vueauthrandomkey'],
@@ -38,9 +38,7 @@ app.use(function(req, res, next) {
 });
 
 
-app.listen({port: 7000}, () =>
-    console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
-);
+
 /*const authMiddleware = (req, res, next) => {
     if (!req.isAuthenticated()) {
         res.status(401).send('You are not authenticated')
@@ -49,10 +47,12 @@ app.listen({port: 7000}, () =>
     }
 }*/
 passport.serializeUser(function(user, done) {
+    console.log('serializing user: ', user);
     done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
+    console.log('serializing user: ', user);
     done(null, user);
 });
 
@@ -63,9 +63,9 @@ passport.use(new FacebookStrategy(config.fb,
         var User = db.sequelize.import('./models/cliente.js')
 
         User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}})
-            .then(function (err, user) {
-                return done(err, user);
-            });
+            .then(function (user, err) {
+                done(JSON.stringify(user[0].dataValues), err);
+            }).catch(done);
     }
 ));
 
@@ -79,12 +79,12 @@ app.get('/auth/facebook/callback',
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 passport.use(new GoogleStrategy(config["ggl"],
-    function (accessToken, refreshToken, profile, cb) {
+    function (accessToken, refreshToken, profile, done) {
 
         var User = db.sequelize.import('./models/cliente.js')
-        User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}}).then( function (err, user) {
-            return cb(err, user);
-        });
+        User.findOrCreate({where: {google_id: profile.id}, defaults: {cliente: profile.displayName}}).then( function (user, err) {
+             done(JSON.stringify(user[0].dataValues), err);
+        }).catch(done);
 
     }
 ));
@@ -106,9 +106,9 @@ passport.use(new LocalStrategy(
                     /*if (!user.validPassword(password)) {
                         return done(null, false, {message: 'Incorrect password.'});
                     }*/
-                    return done(null, user);
+                     done(JSON.stringify(user.dataValues), null);
                 }
-            });
+            }).catch(done);
         }
 
 ));
@@ -128,13 +128,16 @@ app.post('/auth/login',
 app.get('/auth/google',
     passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', {failureRedirect: '/login'}),
-    function (req, res) {
-        res.redirect('/');
-    });
-
+app.get( '/auth/google/callback',
+    passport.authenticate( 'google', {
+        successRedirect: '/auth/google/success',
+        failureRedirect: '/auth/google/failure'
+    }));
 app.get('/login', function () {
     console.log('redirected to login again')
     }
+);
+
+app.listen({port: 7000}, () =>
+    console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
 );
