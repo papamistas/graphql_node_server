@@ -81,13 +81,14 @@ app.get('/auth/facebook/callback',
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 passport.use(new GoogleStrategy(config["ggl"],
-    function (accessToken, refreshToken, profile, done) {
+    function (accessToken, refreshToken, profile, cb) {
 
         var User = db.sequelize.import('./models/cliente.js')
         User.findOrCreate({where: {google_id: profile.id}, defaults: {cliente: profile.displayName}}).then( function (user, err) {
-            done(JSON.stringify(user[0].dataValues), err);
-        }).catch(done);
-
+            cb(JSON.stringify(user[0].dataValues), err);
+        }).catch(function (err) {
+            console.log(err)
+        });
     }
 ));
 
@@ -133,7 +134,7 @@ app.get('/auth/google',
     passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
+    passport.authenticate('google', { failureRedirect: '/' ,successRedirectRedirect: '/'}),
     function(req, res) {
         // Successful authentication, redirect home.
         res.redirect('/');
