@@ -31,50 +31,29 @@ app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
-
-
-/*const authMiddleware = (req, res, next) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).send('You are not authenticated')
+function checkAuth(req, res, next) {
+    if (!req.session.user) {
+        res.send('You are not authorized to view this page');
     } else {
-        return next()
+        next();
     }
-}*/
-passport.serializeUser(function(user, done) {
-    console.log('serializing user: ', user);
-    done(null, user);
-});
+}
 
-passport.deserializeUser(function(user, done) {
-    console.log('serializing user: ', user);
-    done(null, user);
-});
-
-var FacebookStrategy = require('passport-facebook').Strategy;
-
-passport.use(new FacebookStrategy(config.fb,
-    function (accessToken, refreshToken, profile, done) {
+var Strategy = require('passport-facebook').Strategy;
+passport.use(new Strategy(config.fb,
+    function(accessToken, refreshToken, profile, cb) {
+        // In this example, the user's Facebook profile is supplied as the user
+        // record.  In a production-quality application, the Facebook profile should
+        // be associated with a user record in the application's database, which
+        // allows for account linking and authentication with other identity
+        // providers.
         var User = db.sequelize.import('./models/cliente.js')
 
         User.findOrCreate({where: {fb_id: profile.id}, defaults: {cliente: profile.displayName}})
-            .then(function (user, err) {
-                done(JSON.stringify(user[0].dataValues), err);
-            }).catch(done);
-    }
-));
+            .then(function (user) {
+                return cb(null, user);
+            })
 
-app.get('/auth/facebook', passport.authenticate('facebook'));
-
-app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', {
-        successRedirect: '/',
-        failureRedirect: '/login'
     }));
 
 
@@ -85,9 +64,7 @@ passport.use(new GoogleStrategy(config["ggl"],
 
         var User = db.sequelize.import('./models/cliente.js')
         User.findOrCreate({where: {google_id: profile.id}, defaults: {cliente: profile.displayName}}).then( function (user, err) {
-            cb(JSON.stringify(user[0].dataValues), err);
-        }).catch(function (err) {
-            console.log(err)
+            return cb(null, user);
         });
     }
 ));
@@ -96,51 +73,57 @@ var LocalStrategy = require('passport-local').Strategy;
 
 passport.use(new LocalStrategy(
 
-        function(username, password, done) {
-            var User = db.sequelize.import('./models/cliente.js')
-            User.findOne({where: {"email": username}}).then(function (user, err) {
-                {
-                    if (err) {
-                        return done(err);
-                    }
-                    if (!user) {
-                        return done(null, false, {message: 'Incorrect username.'});
-                    }
-                    /*if (!user.validPassword(password)) {
-                        return done(null, false, {message: 'Incorrect password.'});
-                    }*/
-                     done(JSON.stringify(user.dataValues), null);
+    function(username, password, done) {
+        var User = db.sequelize.import('./models/cliente.js')
+        User.findOne({where: {"email": username}}).then(function (user, err) {
+            {
+                if (err) {
+                    return done(err);
                 }
-            }).catch(done);
-        }
+                if (!user) {
+                    return done(null, false, {message: 'Incorrect username.'});
+                }
+                /*if (!user.validPassword(password)) {
+                    return done(null, false, {message: 'Incorrect password.'});
+                }*/
+                done(null,user);
+            }
+        });
+    }
 
 ));
 
-/*app.post('/auth/login', function(req, res){
-    console.log("body parsing", req.body);
-    //should be something like: {username: YOURUSERNAME, password: YOURPASSWORD}
-});*/
 
+passport.serializeUser(function(user, cb) {
+    cb(null, user);
+});
 
-app.post('/auth/login',
-    passport.authenticate('local'),
-    function(req, res) {
-        // If this function gets called, authentication was successful.
-        // `req.user` contains the authenticated user.
-        res.redirect('/users/' + req.user.username)
-    }
-);
+passport.deserializeUser(function(obj, cb) {
+    cb(null, obj);
+});
+
+app.get('/auth/facebook', passport.authenticate('facebook'));
+
+app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+        successRedirect: '/about',
+        failureRedirect: '/login'
+    }));
+
+app.post('/auth/login', passport.authenticate('local', { successRedirect: '/about',
+    failureRedirect: '/login' }));
+
 app.get('/auth/google',
     passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' ,successRedirectRedirect: '/'}),
+    passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/about'}),
     function(req, res) {
         // Successful authentication, redirect home.
         res.redirect('/');
     });
 app.get('/login', function () {
-    console.log('redirected to login again')
+        console.log('redirected to login again')
     }
 );
 
