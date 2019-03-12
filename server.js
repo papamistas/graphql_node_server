@@ -76,6 +76,8 @@ app.get('/auth/facebook/callback',
         successRedirect: '/',
         failureRedirect: '/login'
     }));
+
+
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 passport.use(new GoogleStrategy(config["ggl"],
@@ -83,7 +85,7 @@ passport.use(new GoogleStrategy(config["ggl"],
 
         var User = db.sequelize.import('./models/cliente.js')
         User.findOrCreate({where: {google_id: profile.id}, defaults: {cliente: profile.displayName}}).then( function (user, err) {
-             done(JSON.stringify(user[0].dataValues), err);
+            done(JSON.stringify(user[0].dataValues), err);
         }).catch(done);
 
     }
@@ -120,19 +122,22 @@ passport.use(new LocalStrategy(
 
 
 app.post('/auth/login',
-    passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/login'
-    })
+    passport.authenticate('local'),
+    function(req, res) {
+        // If this function gets called, authentication was successful.
+        // `req.user` contains the authenticated user.
+        res.redirect('/users/' + req.user.username)
+    }
 );
 app.get('/auth/google',
     passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
-app.get( '/auth/google/callback',
-    passport.authenticate( 'google', {
-        successRedirect: '/auth/google/success',
-        failureRedirect: '/auth/google/failure'
-    }));
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function(req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/');
+    });
 app.get('/login', function () {
     console.log('redirected to login again')
     }
