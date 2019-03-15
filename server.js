@@ -30,9 +30,14 @@ app.use(cookieSession({
     keys: ['vueauthrandomkey'],
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
+app.use(require('express-session')({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false
+}));
 
 function checkAuth(req, res, next) {
-    if (!req.session.user) {
+    if (!req.session.passport) {
         res.send('You are not authorized to view this page');
     } else {
         next();
@@ -106,18 +111,18 @@ app.get('/auth/facebook', passport.authenticate('facebook'));
 
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', {
-        successRedirect: '/about',
+        successRedirect: '/',
         failureRedirect: '/login'
     }));
 
-app.post('/auth/login', passport.authenticate('local', { successRedirect: '/about',
+app.post('/auth/login', passport.authenticate('local', { successRedirect: '/',
     failureRedirect: '/login' }));
 
 app.get('/auth/google',
     passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/about'}),
+    passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/'}),
     function(req, res) {
         // Successful authentication, redirect home.
         res.redirect('/');
@@ -126,7 +131,28 @@ app.get('/login', function () {
         console.log('redirected to login again')
     }
 );
+app.get('/test',checkAuth, function () {
+        console.log('redirected to login again')
+    }
+);
 
+/*app.get('/logout', function(req, res){
+    req.session = null
+    /!*req.session.destroy(function() {
+        res.clearCookie('connect.sid');
+        res.redirect('about');
+    });*!/
+});*/
+/*app.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
+});*/
+app.get('/logout', function (req, res) {
+    req.logout();
+    req.session = null
+    //req.session.destroy();
+    return res.redirect('/');
+});
 app.listen({port: 7000}, () =>
     console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
 );
