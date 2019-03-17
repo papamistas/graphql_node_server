@@ -9,7 +9,11 @@ import config from './config/configKeys';
 
 const bodyParser = require('body-parser')
 const cookieSession = require('cookie-session')
-const passport = require('passport')
+const passport = require('passport');
+const bcrypt= require('bcrypt');
+const routes=require('./routes');
+//,senha:bcrypt(password)
+//bcrypt.compare(passwoed,user.senha)
 
 const server = new ApolloServer({
     typeDefs: gql(typeDefs),
@@ -19,7 +23,7 @@ const server = new ApolloServer({
 
 const app = express();
 server.applyMiddleware({app});
-
+//app.use(routes);
 app.use(express.static('app/dist'));
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
@@ -106,53 +110,7 @@ passport.serializeUser(function(user, cb) {
 passport.deserializeUser(function(obj, cb) {
     cb(null, obj);
 });
-
-app.get('/auth/facebook', passport.authenticate('facebook'));
-
-app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', {
-        successRedirect: '/',
-        failureRedirect: '/login'
-    }));
-
-app.post('/auth/login', passport.authenticate('local', { successRedirect: '/',
-    failureRedirect: '/login' }));
-
-app.get('/auth/google',
-    passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
-
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/'}),
-    function(req, res) {
-        // Successful authentication, redirect home.
-        res.redirect('/');
-    });
-app.get('/login', function () {
-        console.log('redirected to login again')
-    }
-);
-app.get('/test',checkAuth, function () {
-        console.log('redirected to login again')
-    }
-);
-
-/*app.get('/logout', function(req, res){
-    req.session = null
-    /!*req.session.destroy(function() {
-        res.clearCookie('connect.sid');
-        res.redirect('about');
-    });*!/
-});*/
-/*app.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/');
-});*/
-app.get('/logout', function (req, res) {
-    req.logout();
-    req.session = null
-    //req.session.destroy();
-    return res.redirect('/');
-});
 app.listen({port: 7000}, () =>
-    console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
+    routes.handler(app,passport,checkAuth)
+    //console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
 );
