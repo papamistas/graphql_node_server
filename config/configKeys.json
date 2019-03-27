@@ -1,0 +1,13 @@
+{
+  "fb": {
+    "clientID": 2283537038597632,
+    "clientSecret": "aa1bc4fa1e7b6e05128a80c8932951aa",
+    "callbackURL": "http://localhost:7000/auth/facebook/callback"
+  },
+  "ggl": {
+    "clientID": "150235012843-eibaqvkld98i32jl8heif2l4krervj5d.apps.googleusercontent.com",
+    "clientSecret": "_aSDv_nJGwqzH2YFdlmkzFgs",
+    "callbackURL": "http://localhost:7000/auth/google/callback"
+  }
+
+}

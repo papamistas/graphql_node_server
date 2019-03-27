@@ -65,14 +65,14 @@ const requestHandler=(app,passport,checkAuth)=>{
             failureRedirect: '/login'
         }));
 
-    app.post('/auth/login', passport.authenticate('local', { successRedirect: '/',
+    app.post('/auth/login', passport.authenticate('local', { successRedirect: '/test',
         failureRedirect: '/login' }));
 
     app.get('/auth/google',
         passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
     app.get('/auth/google/callback',
-        passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/'}),
+        passport.authenticate('google', { failureRedirect: '/login' ,successRedirect: '/test'}),
         function(req, res) {
             // Successful authentication, redirect home.
             res.redirect('/');
@@ -83,6 +83,11 @@ const requestHandler=(app,passport,checkAuth)=>{
     );
     app.get('/test',checkAuth, function (req,res) {
             console.log('redirected to test again')
+       /* if (window.location.hash == '#_=_') {
+            window.location.hash = ''; // for older browsers, leaves a # behind
+            history.pushState('', document.title, window.location.pathname); // nice and clean
+            e.preventDefault(); // no page reload
+        }*/
         res.redirect('/about')
         }
     );
