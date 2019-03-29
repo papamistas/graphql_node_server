@@ -61,12 +61,23 @@ const requestHandler=(app,passport,checkAuth)=>{
 
     app.get('/auth/facebook/callback',
         passport.authenticate('facebook', {
-            successRedirect: '/test',
+            successRedirect: '/',
             failureRedirect: '/login'
-        }));
+        }),function(req, res) {
+            // Successful authentication, redirect home.
+            //res.redirect('/');
+            //res.send({ hello: 'world' });
+            res.status(404).end();
+        });
 
     app.post('/auth/login', passport.authenticate('local', { successRedirect: '/',
-        failureRedirect: '/login' }));
+        failureRedirect: '/login' }),function(req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/');
+    });
+
+
+
 
     app.get('/auth/google',
         passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
@@ -83,7 +94,7 @@ const requestHandler=(app,passport,checkAuth)=>{
     );
     app.get('/test',checkAuth, function (req,res) {
             console.log('redirected to test again')
-        res.redirect('/about')
+        //res.redirect('/about')
         }
     );
     app.get('/logout', function (req, res) {

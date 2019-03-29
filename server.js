@@ -24,7 +24,7 @@ const server = new ApolloServer({
 const app = express();
 server.applyMiddleware({app});
 //app.use(routes);
-app.use(express.static('app/dist'));
+//app.use(express.static('app/dist'));
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
 app.use(passport.initialize());
@@ -58,6 +58,7 @@ passport.serializeUser(function(user, cb) {
 passport.deserializeUser(function(obj, cb) {
     cb(null, obj);
 });
+
 app.listen({port: 7000}, () =>
     routes.handler(app,passport,checkAuth)
     //console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
