@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --entry ./app/public/js/index.js --output-filename bundle.min.js --output-path ./app/public/js ",
-    "start": " ndb ./node_modules/nodemon/bin/nodemon.js  --inspect --exec babel-node server.js",
+    "start": "nodemon --exec babel-node start.js --watch server",
     "sequelize-skeleton": "./node_modules/sequelize-cli/lib/sequelize init:models; ./node_modules/sequelize-cli/lib/sequelize init:config",
     "init-db": "cd /usr/bin && ./mysql -u root && cd - "
   },
@@ -13,10 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-boost": "^0.1.27",
-    "apollo-server-express": "^2.4.0",
+    "apollo-boost": "^0.1.28",
+    "apollo-server-express": "^2.4.8",
     "axios": "^0.18.0",
-    "bcrypt": "^3.0.4",
+    "bcrypt": "^3.0.5",
     "body-parser": "^1.13.2",
     "connect-ensure-login": "^0.1.1",
     "connect-flash": "^0.1.1",
@@ -37,17 +37,18 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "req-flash": "0.0.3",
-    "sequelize": "^4.42.0"
+    "sequelize": "^4.43.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
     "faker": "^4.1.0",
     "lodash": "^4.17.11",
     "nodemon": "^1.18.10",
     "sequelize-cli": "^5.4.0",
-    "webpack": "^4.29.3",
-    "webpack-cli": "^3.2.3"
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
   }
 }
