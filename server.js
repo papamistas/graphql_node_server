@@ -1,5 +1,4 @@
 import express from 'express';
-import { Nuxt, Builder } from 'nuxt'
 import {ApolloServer, gql} from 'apollo-server-express';
 import faker from 'faker';
 import lodash from 'lodash';
@@ -49,20 +48,7 @@ function checkAuth(req, res, next) {
     }
 }
 
-let configNuxt = require('./nuxt.config.js')
-configNuxt.dev = !(process.env.NODE_ENV === 'production')
 
-// Init Nuxt.js
-const nuxt = new Nuxt(configNuxt)
-
-// Build only in dev mode
-if (configNuxt.dev) {
-  const builder = new Builder(nuxt)
-  builder.build()
-}
-
-// Give nuxt middleware to express
-app.use(nuxt.render)
 
 
 passport.serializeUser(function(user, cb) {
