@@ -1,7 +1,7 @@
 import config from "./config/configKeys";
 import db from "./models";
 
-const requestHandler=(app,passport,checkAuth)=>{
+const requestHandler=(app,passport,checkAuth,cors)=>{
 
     let Strategy = require('passport-facebook').Strategy;
     passport.use(new Strategy(config.fb,
@@ -56,12 +56,18 @@ const requestHandler=(app,passport,checkAuth)=>{
         }
 
     ));
+    app.options("/*", function(req, res, next){
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+        res.send(200);
+    });
 
-    app.get('/auth/facebook', passport.authenticate('facebook'));
+    app.get('/auth/facebook',passport.authenticate('facebook'));
 
     app.get('/auth/facebook/callback',
         passport.authenticate('facebook', {
-            successRedirect: '/',
+            successRedirect: '/auth/test',
             failureRedirect: '/login'
         }),function(req, res) {
             // Successful authentication, redirect home.
@@ -83,21 +89,21 @@ const requestHandler=(app,passport,checkAuth)=>{
         passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/plus.login']}));
 
     app.get('/auth/google/callback',
-        passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/'}),
+        passport.authenticate('google', { failureRedirect: '/' ,successRedirect: '/auth/test'}),
         function(req, res) {
             // Successful authentication, redirect home.
             res.redirect('/');
         });
-    app.get('/login', function () {
+    app.get('/auth/login', function () {
             console.log('redirected to login again')
         }
     );
-    app.get('/test',checkAuth, function (req,res) {
-            console.log('redirected to test again')
+    app.get('/auth/test',checkAuth, function (req,res) {
+            res.send('redirected to test again')
         //res.redirect('/about')
         }
     );
-    app.get('/logout', function (req, res) {
+    app.get('/auth/logout', function (req, res) {
         req.logout();
         req.session = null
         //req.session.destroy();

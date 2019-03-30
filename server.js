@@ -1,12 +1,13 @@
 import express from 'express';
+
 import {ApolloServer, gql} from 'apollo-server-express';
 import faker from 'faker';
 import lodash from 'lodash';
 import typeDefs from './schema';
 import resolvers from './resolvers';
 import db from './models';
-import config from './config/configKeys';
 
+const cors = require('cors');
 const bodyParser = require('body-parser')
 const cookieSession = require('cookie-session')
 const passport = require('passport');
@@ -22,9 +23,17 @@ const server = new ApolloServer({
 });
 
 const app = express();
+app.use(cors())
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+})
+
 server.applyMiddleware({app});
 //app.use(routes);
 //app.use(express.static('app/dist'));
+
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
 app.use(passport.initialize());
@@ -50,7 +59,6 @@ function checkAuth(req, res, next) {
 
 
 
-
 passport.serializeUser(function(user, cb) {
     cb(null, user);
 });
@@ -60,6 +68,6 @@ passport.deserializeUser(function(obj, cb) {
 });
 
 app.listen({port: 7000}, () =>
-    routes.handler(app,passport,checkAuth)
+    routes.handler(app,passport,checkAuth,cors)
     //console.log(`🚀 Server ready at http://localhost:7000${server.graphqlPath}`),
 );
