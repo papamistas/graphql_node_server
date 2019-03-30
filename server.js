@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
 
 server.applyMiddleware({app});
 //app.use(routes);
-//app.use(express.static('app/dist'));
+app.use(express.static('app/dist'));
 
 app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
 app.use(bodyParser.json())
